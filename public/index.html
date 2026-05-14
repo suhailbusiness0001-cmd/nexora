@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="language" content="English">
+<meta name="geo.region" content="US, GB, CA, AU">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora | Premium All-in-One Downloader</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">
+        <a href="index.html" style="text-decoration:none; color:inherit;">NEXORA<span>.</span></a>
+    </div>
+
+    <div class="nav-links">
+        <a href="guide.html">Guide</a>
+        <a href="faq.html">FAQ</a>
+        
+        <button id="theme-btn" class="badge">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+</nav>
+
+   <section class="hero">
+    <h1 class="gradient-text">Download Faster.</h1>
+    <p style="color: var(--text-dim);">Premium video downloader for TikTok, Instagram, and more.</p>
+    
+    <div class="downloader-container">
+        <div class="input-wrapper">
+            <input type="text" id="videoUrl" placeholder="Paste link here...">
+            <button class="dl-btn" id="startDl">Download</button>
+        </div>
+
+        <div id="preview-container" style="display: none; margin-top: 25px; text-align: center; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+            <video id="videoPreview" controls style="width: 100%; max-width: 350px; border-radius: 15px; margin-bottom: 15px;"></video>
+            <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <a id="hdDownloadBtn" href="#" target="_blank" style="padding: 10px 15px; background: #22c55e; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: none;">HD <span id="hdSize"></span></a>
+                <a id="sdDownloadBtn" href="#" target="_blank" style="padding: 10px 15px; background: #6366f1; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: none;">SD <span id="sdSize"></span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="platforms">
+        <span class="badge"><i class="fab fa-tiktok"></i> TikTok</span>
+        <span class="badge"><i class="fab fa-instagram"></i> Instagram</span>
+        <span class="badge"><i class="fab fa-twitter"></i> Twitter/X</span>
+    </div>
+
+    <div class="ad-placeholder">
+        <span>Advertisement</span>
+    </div>
+</section>
+
+    <section class="features">
+        </section>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
+<section class="hero" style="background: rgba(255,255,255,0.01); border-top: 1px solid var(--glass-border);">
+    <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 60px 20px; text-align: left;">
+        <h2 class="gradient-text" style="font-size: 2rem; margin-bottom: 20px;">Nexora Global: The Choice for High-Speed Downloads</h2>
+        <p style="color: var(--text-dim); margin-bottom: 30px;">
+            Whether you are in <b>New York, London, or Berlin</b>, Nexora provides the fastest cloud-based server links to fetch your media in HD. Our infrastructure is optimized for Tier-1 networks to ensure zero latency.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="downloader-container" style="margin: 0; padding: 20px;">
+                <h4><i class="fas fa-globe-americas"></i> Privacy Focused</h4>
+                <p style="font-size: 0.85rem; color: var(--text-dim);">Strict compliance with GDPR and CCPA standards for our users in the US and Europe.</p>
+            </div>
+            <div class="downloader-container" style="margin: 0; padding: 20px;">
+                <h4><i class="fas fa-server"></i> Edge Servers</h4>
+                <p style="font-size: 0.85rem; color: var(--text-dim);">Media processing happens on servers closest to your location for maximum speed.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    const themeBtn = document.getElementById('theme-btn');
+    const body = document.body;
+
+    // Check if user already has a preference
+    if (localStorage.getItem('theme') === 'light') {
+        body.classList.add('light-theme');
+    }
+
+    themeBtn.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+        
+        // Save preference to browser
+        if (body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+        } else {
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+</script>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Video Downloader | MP4 HD - Nexora</title>
+    <link rel="stylesheet" href="css/style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="index.html" style="text-decoration:none; color:inherit;">NEXORA<span>.</span></a></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <button id="theme-btn" class="badge">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1 class="gradient-text">Facebook Downloader</h1>
+        <p class="subtitle">Download Facebook Videos, Reels, and Stories in HD.</p>
+
+        <div class="downloader-container">
+            <div class="input-wrapper">
+                <input type="text" id="videoUrl" placeholder="Paste Facebook link here...">
+                <button class="dl-btn" id="startDl">Download</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="ad-slot">Advertisement Space</div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
+
+<script>
+    const themeBtn = document.getElementById('theme-btn');
+    const body = document.body;
+
+    // Check if user already has a preference
+    if (localStorage.getItem('theme') === 'light') {
+        body.classList.add('light-theme');
+    }
+
+    themeBtn.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+        
+        // Save preference to browser
+        if (body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+        } else {
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+</script>

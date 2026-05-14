@@ -1,0 +1,264 @@
+/* Inter Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+:root {
+    --primary: #6366f1;
+    --secondary: #a855f7;
+    --bg-dark: #05070a; /* Konjam innum dark-a vecha premium look kidaikum */
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-main: #ffffff;
+    --text-dim: #94a3b8;
+    --accent-glow: rgba(99, 102, 241, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Background Glow Effect (Optional but Premium) */
+body::before {
+    content: "";
+    position: fixed;
+    top: -10%;
+    left: -10%;
+    width: 40%;
+    height: 40%;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    z-index: -1;
+}
+
+/* Navbar */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 20px 8%; /* Side gaps balance panna */
+    display: flex;
+    justify-content: space-between; /* Logo left-layum, Links right-layum irukkum */
+    align-items: center;
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 1000;
+    background: rgba(5, 7, 10, 0.8); /* Glass effect */
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px; /* Links-ku naduvula nalla gap varum */
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--primary); /* Hover panna purple color maarum */
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.logo span { color: var(--primary); }
+
+/* Hero Section Styles */
+.hero {
+    padding: 160px 20px 80px;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.gradient-text {
+    font-size: clamp(2.2rem, 8vw, 4rem);
+    font-weight: 800;
+    /* Gradient direction and colors */
+    background: linear-gradient(135deg, #ffffff 30%, var(--primary) 100%);
+    
+    /* Standard property (Must be before webkit for some browsers) */
+    background-clip: text; 
+    
+    /* Vendor prefix for Chrome, Safari, Edge */
+    -webkit-background-clip: text;
+    
+    /* Transparent panna dhaan background gradient theriyum */
+    -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback for other browsers */
+    
+    letter-spacing: -2px;
+    line-height: 1.1;
+}
+.subtitle {
+    margin-top: 15px;
+    font-size: 1.1rem;
+    color: var(--text-dim);
+}
+
+/* Glass Downloader Box */
+.downloader-container {
+    max-width: 750px;
+    margin: 50px auto;
+    background: var(--glass);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border);
+    padding: 25px;
+    border-radius: 28px;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: row; /* Desktop setting */
+    gap: 10px;
+    background: rgba(0,0,0,0.3);
+    padding: 6px;
+    border-radius: 18px;
+    border: 1px solid var(--glass-border);
+    transition: 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 14px 18px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.dl-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    padding: 14px 28px;
+    border-radius: 14px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dl-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+}
+
+/* Platform Badges */
+.platforms {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge:hover {
+    background: rgba(255,255,255,0.08);
+    color: white;
+    border-color: rgba(255,255,255,0.3);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .input-wrapper {
+        flex-direction: column;
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+    
+    input {
+        background: rgba(255,255,255,0.05);
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border: 1px solid var(--glass-border);
+    }
+    
+    .dl-btn {
+        width: 100%;
+        padding: 18px;
+    }
+}
+
+/* Ad Placement Placeholder */
+.ad-slot {
+    margin: 40px auto;
+    max-width: 728px;
+    height: 90px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #444;
+    font-size: 0.8rem;
+    border-radius: 12px;
+}
+/* Light mode-la input box and text innum clear-ah theriyanum */
+body.light-theme .downloader-container {
+    background: #ffffff !important; /* Pure white for better contrast */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-theme input {
+    background: #f1f5f9 !important; /* Very light grey/blue */
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important; /* Dark text for readability */
+}
+
+body.light-theme input::placeholder {
+    color: #94a3b8 !important; /* Placeholder color visibility */
+}
+
+/* Navbar links and logo color fix */
+body.light-theme .navbar {
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+body.light-theme .nav-links a {
+    color: #1e293b !important;
+}
+
+body.light-theme .logo {
+    color: #0f172a !important;
+}
