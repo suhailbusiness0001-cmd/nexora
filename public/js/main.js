@@ -1,6 +1,5 @@
-// public/js/main.js
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Theme Logic ---
+    // --- 1. Theme Logic ---
     const themeBtn = document.getElementById('theme-btn');
     const body = document.body;
     const icon = themeBtn ? themeBtn.querySelector('i') : null;
@@ -19,13 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Download Logic ---
-    const dlBtn = document.getElementById('startDl');
-    const input = document.getElementById('videoUrl');
+    // --- 2. Download Logic ---
+    const dlBtn = document.getElementById('download-btn');
+    const input = document.getElementById('url-input');
     const previewContainer = document.getElementById('preview-container');
 
-    if (dlBtn) {
-        dlBtn.onclick = async () => {
+    if (dlBtn && input && previewContainer) {
+        dlBtn.addEventListener('click', async () => {
             const url = input.value.trim();
             if (!url) return alert("Please paste a link!");
 
@@ -33,71 +32,34 @@ document.addEventListener('DOMContentLoaded', () => {
             dlBtn.disabled = true;
 
             try {
-                // image_1f0b54.png connection issue-va solve panna fetch timeout handle pannuvom
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds wait pannum
-
-                const response = await fetch('https://api.cobalt.tools/api/json', {
+                const response = await fetch('/api/api-handler', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        url: url,
-                        videoQuality: '720'
-                    }),
-                    signal: controller.signal
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
                 });
 
-                clearTimeout(timeoutId);
                 const data = await response.json();
 
-                if (data && data.url) {
-                    document.getElementById('videoPreview').src = data.url;
-                    document.getElementById('hdDownloadBtn').href = data.url;
-                    document.getElementById('hdDownloadBtn').style.display = "inline-block";
+                if (data && (data.url || data.stream)) {
+                    const finalUrl = data.url || data.stream;
+
+                    document.getElementById('videoTitle').innerText = data.filename || "Video Ready";
+                    document.getElementById('videoPreview').src = finalUrl;
+                    document.getElementById('hdDownloadBtn').href = finalUrl;
+
                     previewContainer.style.display = "block";
                     previewContainer.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    alert("AI could not extract this video. Try a YouTube link!");
+                    console.log("Full API Response:", data);
+                    alert("Server Message: " + (data.error || data.text || "Extraction failed"));
                 }
 
             } catch (err) {
                 console.error("Master Error:", err);
-                // image_1f0b54.png fallback message
-                if (err.name === 'AbortError') {
-                    alert("Connection Timeout! Server is too slow, please try again.");
-                } else {
-                    alert("STILL BLOCKED: Chrome is stopping the request. \n\nFIX: Open your project in Firefox or install 'CORS Unblock' extension on Chrome!");
-                }
+                alert("Server error! Make sure you ran 'vercel --prod'.");
             } finally {
                 dlBtn.innerText = "Download";
                 dlBtn.disabled = false;
             }
-        };
+        });
     }
-});
-
-// main.js-la fetch function kulla
-const response = await fetch('/api/download', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ url: input.value })
-});
-
-const data = await response.json();
-
-if (data.status === 'ok' || data.url) {
-    // 1. Title set pannuvom
-    document.getElementById('videoTitle').innerText = data.filename || "Your AI Video is Ready";
-    
-    // 2. Playable Preview set pannuvom
-    document.getElementById('videoPreview').src = data.url;
-    
-    // 3. Download link update pannuvom
-    document.getElementById('hdDownloadBtn').href = data.url;
-
-    // 4. Everything show pannuvom
-    document.getElementById('preview-container').style.display = 'block';
-}
