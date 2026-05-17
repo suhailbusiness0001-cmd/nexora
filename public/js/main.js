@@ -19,12 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. Download Logic ---
-    const dlBtn = document.getElementById('download-btn');
-    const input = document.getElementById('url-input');
+    const dlBtn = document.getElementById('startDl');
+    const input = document.getElementById('videoUrl');
     const previewContainer = document.getElementById('preview-container');
 
-    if (dlBtn && input && previewContainer) {
-        dlBtn.addEventListener('click', async () => {
+    if (dlBtn) {
+        dlBtn.onclick = async () => {
             const url = input.value.trim();
             if (!url) return alert("Please paste a link!");
 
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data && (data.url || data.stream)) {
                     const finalUrl = data.url || data.stream;
-
+                    
                     document.getElementById('videoTitle').innerText = data.filename || "Video Ready";
                     document.getElementById('videoPreview').src = finalUrl;
                     document.getElementById('hdDownloadBtn').href = finalUrl;
@@ -50,16 +50,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewContainer.style.display = "block";
                     previewContainer.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    console.log("Full API Response:", data);
-                    alert("Server Message: " + (data.error || data.text || "Extraction failed"));
+                    // Cobalt server enna error anupudhunu ippo real-ah alert aagum
+                    alert("API Error: " + (data.error || data.text || "Extraction failed. Platform might be rate-limited."));
                 }
 
             } catch (err) {
                 console.error("Master Error:", err);
-                alert("Server error! Make sure you ran 'vercel --prod'.");
+                alert("Server Error! Check if Vercel deployment has functions.");
             } finally {
                 dlBtn.innerText = "Download";
                 dlBtn.disabled = false;
             }
-        });
+        };
     }
+});
