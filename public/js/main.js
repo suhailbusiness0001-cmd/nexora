@@ -28,26 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const url = input.value.trim();
             if (!url) return alert("Please paste a valid video link!");
 
-            dlBtn.innerText = "Extracting Video...";
+            dlBtn.innerText = "Extracting Media...";
             dlBtn.disabled = true;
 
             try {
-                // CLUSTER 1: பிரண்ட்எண்ட்ல இருந்தே நேரடியாக இயங்கும் அதிவேக மீடியா இன்ஜின் API
+                // ENGINE 1: பிரண்ட்எண்ட்ல இருந்தே நேரடியாக இயங்கும் அதிவேக ஓபன்-சோர்ஸ் API
                 const response = await fetch('https://api.allvideodownloader.cc/api/v1/download', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: url })
                 });
 
-                // ரெஸ்பான்ஸ் ஸ்ட்ரிங்காக இருந்தால் அதை டெக்ஸ்டாக மாற்றி செக் செய்கிறோம்
-                const textData = await response.text();
-                let data;
-                
-                try {
-                    data = JSON.parse(textData);
-                } catch(e) {
-                    throw new Error("Cluster 1 returned non-JSON response");
-                }
+                const data = await response.json();
 
                 if (response.ok && data && data.success && data.data) {
                     const videoLink = data.data.video_url || data.data.download_url;
@@ -63,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // FALLBACK ROUTER: முதலாவது பிஸியாக இருந்தால் இயங்கும் மாற்று பிரண்ட்எண்ட் எக்ஸ்ட்ராக்டர்
+                // BACKUP ENGINE 2: முதலாவது பிஸியாக இருந்தால் இயங்கும் மாற்று எக்ஸ்ட்ராக்டர்
                 console.log("Switching to backup parser cluster...");
                 const response2 = await fetch('https://api.download.savetube.me/v1/twitt/video-url', {
                     method: 'POST',
@@ -84,15 +76,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                alert("API Cluster Notice: All extraction engines are busy. Retrying in 5 seconds...");
+                // EMERGENCY FALLBACK விட்ஜெட் லிங்க்
+                const backupWidgetUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
+                document.getElementById('videoTitle').innerText = "Click Download to Get Premium Media";
+                document.getElementById('hdDownloadBtn').href = backupWidgetUrl;
+                document.getElementById('hdDownloadBtn').target = "_blank";
+                
+                if (previewContainer) {
+                    previewContainer.style.display = "block";
+                    previewContainer.scrollIntoView({ behavior: 'smooth' });
+                }
 
             } catch (err) {
-                console.error("Nexora Network Core Error:", err);
+                console.error("Nexora Core Error:", err);
                 
-                // EMERGENCY BYPASS: இரண்டுமே வேலை செய்யாத பட்சத்தில், பயனருக்கு நேரடியாக டவுன்லோடு செய்யும் எளிய விட்ஜெட் லிங்க்
-                const backupCleanUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
-                document.getElementById('videoTitle').innerText = "Click Below to Download Premium Media";
-                document.getElementById('hdDownloadBtn').href = backupCleanUrl;
+                // நெட்வொர்க் எர்ரர் வந்தால் நேரடியாக டவுன்லோடு செய்ய வைக்கும் விட்ஜெட்
+                const fallbackUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
+                document.getElementById('videoTitle').innerText = "Click Download to Get Premium Media";
+                document.getElementById('hdDownloadBtn').href = fallbackUrl;
                 document.getElementById('hdDownloadBtn').target = "_blank";
                 
                 if (previewContainer) {
@@ -105,3 +106,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     }
+});
