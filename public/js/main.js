@@ -26,7 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dlBtn) {
         dlBtn.onclick = async () => {
             const url = input.value.trim();
-            if (!url) return alert("Please paste a link!");
+            if (!url) {
+                alert("Please paste a link!");
+                return;
+            }
 
             dlBtn.innerText = "Connecting...";
             dlBtn.disabled = true;
@@ -40,23 +43,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
 
-                if (data && (data.url || data.stream)) {
-                    const finalUrl = data.url || data.stream;
-                    
+                if (response.ok && data && data.url) {
+                    // வெற்றிகரமாக டேட்டா கிடைத்துவிட்டால்
                     document.getElementById('videoTitle').innerText = data.filename || "Video Ready";
-                    document.getElementById('videoPreview').src = finalUrl;
-                    document.getElementById('hdDownloadBtn').href = finalUrl;
+                    document.getElementById('videoPreview').src = data.url;
+                    document.getElementById('hdDownloadBtn').href = data.url;
 
-                    previewContainer.style.display = "block";
-                    previewContainer.scrollIntoView({ behavior: 'smooth' });
+                    if (previewContainer) {
+                        previewContainer.style.display = "block";
+                        previewContainer.scrollIntoView({ behavior: 'smooth' });
+                    }
                 } else {
-                    // Cobalt server enna error anupudhunu ippo real-ah alert aagum
-                    alert("API Error: " + (data.error || data.text || "Extraction failed. Platform might be rate-limited."));
+                    // சர்வர் ஏதேனும் பிழை மெசேஜ் அனுப்பினால்
+                    alert("API Error: " + (data.error || "Extraction failed. Server rate-limited."));
                 }
 
             } catch (err) {
-                console.error("Master Error:", err);
-                alert("Server Error! Check if Vercel deployment has functions.");
+                console.error("Frontend Master Error:", err);
+                alert("Server Connection Error! Please try again.");
             } finally {
                 dlBtn.innerText = "Download";
                 dlBtn.disabled = false;

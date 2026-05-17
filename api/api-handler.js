@@ -8,32 +8,9 @@ export default async function handler(req, res) {
 
     const { url } = req.body;
 
-    // --- INSTANCE 1: AllVideoDownloader API ---
     try {
-        console.log("Trying Instance 1...");
-        const res1 = await fetch('https://api.allvideodownloader.cc/api/v1/download', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: url })
-        });
-        
-        if (res1.ok) {
-            const data1 = await res1.json();
-            if (data1 && data1.success && data1.data) {
-                return res.status(200).json({
-                    url: data1.data.video_url || data1.data.download_url,
-                    filename: data1.data.title || "Video Ready"
-                });
-            }
-        }
-    } catch (e) {
-        console.log("Instance 1 failed, moving to Instance 2...");
-    }
-
-    // --- INSTANCE 2: Cobalt Tools Premium Mirror ---
-    try {
-        console.log("Trying Instance 2 (Cobalt Premium Mirror)...");
-        const res2 = await fetch('https://cobalt.betatv.ch/api/json', {
+        // மிகவும் ஸ்ட்ராங்கான ஒரு Cobalt Premium Mirror API
+        const response = await fetch('https://cobalt.betatv.ch/api/json', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,21 +24,20 @@ export default async function handler(req, res) {
             })
         });
 
-        if (res2.ok) {
-            const data2 = await res2.json();
-            if (data2 && (data2.url || data2.stream)) {
-                return res.status(200).json({
-                    url: data2.url || data2.stream,
-                    filename: data2.filename || "Video Ready"
-                });
-            }
-        }
-    } catch (e) {
-        console.log("Instance 2 failed as well.");
-    }
+        const data = await response.json();
 
-    // ரெண்டுமே வேலை செய்யலைனா மட்டும் தான் இந்த எர்ரர் வரும்
-    return res.status(500).json({ 
-        error: "All backend clusters are temporarily rate-limited. Please retry in 10 seconds." 
-    });
+        if (response.ok && data && (data.url || data.stream)) {
+            return res.status(200).json({
+                url: data.url || data.stream,
+                filename: data.filename || "Video Ready"
+            });
+        } else {
+            return res.status(400).json({ 
+                error: data.text || data.error || "This specific video cannot be extracted right now." 
+            });
+        }
+    } catch (error) {
+        console.error("Backend Error:", error);
+        return res.status(500).json({ error: "Downloader engine is busy. Retry in 5 seconds!" });
+    }
 }
