@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-   export default async function handler(req, res) {
     // CORS கொள்கைகளுக்கான பாதுகாப்பு அமைப்புகள்
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
