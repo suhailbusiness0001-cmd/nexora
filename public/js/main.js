@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. Download Logic ---
+   document.addEventListener('DOMContentLoaded', () => {
     const dlBtn = document.getElementById('startDl');
     const input = document.getElementById('videoUrl');
     const previewContainer = document.getElementById('preview-container');
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         previewContainer.scrollIntoView({ behavior: 'smooth' });
                     }
                 } else {
-                    // சர்வர் ஏதேனும் பிழை மெசேஜ் அனுப்பினால்
+                    // ஏபிஐ அனுப்பும் உண்மையான எர்ரர் மெசேஜ் இப்போ அலர்ட் ஆகும்
                     alert("API Error: " + (data.error || "Extraction failed. Server rate-limited."));
                 }
 
