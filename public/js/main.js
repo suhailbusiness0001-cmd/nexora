@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. Download Logic ---
+   document.addEventListener('DOMContentLoaded', () => {
     const dlBtn = document.getElementById('startDl');
     const input = document.getElementById('videoUrl');
     const previewContainer = document.getElementById('preview-container');
@@ -28,10 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const url = input.value.trim();
             if (!url) return alert("Please paste a link!");
 
-            dlBtn.innerText = "Connecting...";
+            dlBtn.innerText = "Connecting Server...";
             dlBtn.disabled = true;
 
             try {
+                // இப்போ ரௌட்டிங் பக்காவா வேலை செய்யும்
                 const response = await fetch('/api/api-handler', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -50,12 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         previewContainer.scrollIntoView({ behavior: 'smooth' });
                     }
                 } else {
-                    alert("API Error: " + (data.error || "Extraction failed. Server rate-limited."));
+                    alert("Server Error: " + (data.error || "Check Vercel functions setup."));
                 }
 
             } catch (err) {
-                console.error("Frontend Error:", err);
-                alert("Server Connection Error! Please try again.");
+                console.error("Master Error:", err);
+                alert("Server Error! Check if Vercel deployment has functions.");
             } finally {
                 dlBtn.innerText = "Download";
                 dlBtn.disabled = false;
