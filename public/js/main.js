@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const url = input.value.trim();
             if (!url) return alert("Please paste a valid video link!");
 
-            dlBtn.innerText = "Extracting Media...";
+            dlBtn.innerText = "Extracting Video...";
             dlBtn.disabled = true;
 
             try {
@@ -39,7 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ url: url })
                 });
 
-                const data = await response.json();
+                // ரெஸ்பான்ஸ் ஸ்ட்ரிங்காக இருந்தால் அதை டெக்ஸ்டாக மாற்றி செக் செய்கிறோம்
+                const textData = await response.text();
+                let data;
+                
+                try {
+                    data = JSON.parse(textData);
+                } catch(e) {
+                    throw new Error("Cluster 1 returned non-JSON response");
+                }
 
                 if (response.ok && data && data.success && data.data) {
                     const videoLink = data.data.video_url || data.data.download_url;
@@ -76,15 +84,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                alert("API Cluster Notice: Media server is temporarily rate-limited. Retrying now...");
+                alert("API Cluster Notice: All extraction engines are busy. Retrying in 5 seconds...");
 
             } catch (err) {
                 console.error("Nexora Network Core Error:", err);
-                alert("Extraction network sync delay. Please click the Download button again!");
+                
+                // EMERGENCY BYPASS: இரண்டுமே வேலை செய்யாத பட்சத்தில், பயனருக்கு நேரடியாக டவுன்லோடு செய்யும் எளிய விட்ஜெட் லிங்க்
+                const backupCleanUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
+                document.getElementById('videoTitle').innerText = "Click Below to Download Premium Media";
+                document.getElementById('hdDownloadBtn').href = backupCleanUrl;
+                document.getElementById('hdDownloadBtn').target = "_blank";
+                
+                if (previewContainer) {
+                    previewContainer.style.display = "block";
+                    previewContainer.scrollIntoView({ behavior: 'smooth' });
+                }
             } finally {
                 dlBtn.innerText = "Download";
                 dlBtn.disabled = false;
             }
         };
     }
-});
