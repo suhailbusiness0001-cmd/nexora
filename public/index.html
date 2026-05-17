@@ -83,22 +83,90 @@
     </div>
 </section>
 <script>
-    const themeBtn = document.getElementById('theme-btn');
-    const body = document.body;
+        document.addEventListener('DOMContentLoaded', () => {
+            const dlBtn = document.getElementById('startDl');
+            const input = document.getElementById('videoUrl');
+            const previewContainer = document.getElementById('preview-container');
 
-    // Check if user already has a preference
-    if (localStorage.getItem('theme') === 'light') {
-        body.classList.add('light-theme');
-    }
+            if (dlBtn) {
+                dlBtn.onclick = async () => {
+                    const url = input.value.trim();
+                    if (!url) return alert("Please paste a valid video link!");
 
-    themeBtn.addEventListener('click', () => {
-        body.classList.toggle('light-theme');
-        
-        // Save preference to browser
-        if (body.classList.contains('light-theme')) {
-            localStorage.setItem('theme', 'light');
-        } else {
-            localStorage.setItem('theme', 'dark');
-        }
-    });
-</script>
+                    dlBtn.innerText = "Extracting Video...";
+                    dlBtn.disabled = true;
+
+                    try {
+                        // 1st DIRECT ENGINE: பிரண்ட்எண்ட்ல இருந்தே நேரடியாக இயங்கும் API
+                        const response = await fetch('https://api.allvideodownloader.cc/api/v1/download', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ url: url })
+                        });
+
+                        const textData = await response.text();
+                        let data;
+                        try {
+                            data = JSON.parse(textData);
+                        } catch(e) {
+                            throw new Error("Engine 1 text response");
+                        }
+
+                        if (response.ok && data && data.success && data.data) {
+                            const videoLink = data.data.video_url || data.data.download_url;
+                            
+                            document.getElementById('videoTitle').innerText = data.data.title || "Nexora Ready File";
+                            document.getElementById('videoPreview').src = videoLink;
+                            document.getElementById('hdDownloadBtn').href = videoLink;
+
+                            if (previewContainer) {
+                                previewContainer.style.display = "block";
+                                previewContainer.scrollIntoView({ behavior: 'smooth' });
+                            }
+                            return;
+                        }
+
+                        // 2nd BACKUP ENGINE
+                        console.log("Switching to backup parser...");
+                        const response2 = await fetch('https://api.download.savetube.me/v1/twitt/video-url', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ url: url })
+                        });
+
+                        const data2 = await response2.json();
+                        if (response2.ok && data2 && data2.url) {
+                            document.getElementById('videoTitle').innerText = data2.title || "Nexora Premium Download";
+                            document.getElementById('videoPreview').src = data2.url;
+                            document.getElementById('hdDownloadBtn').href = data2.url;
+
+                            if (previewContainer) {
+                                previewContainer.style.display = "block";
+                                previewContainer.scrollIntoView({ behavior: 'smooth' });
+                            }
+                            return;
+                        }
+
+                        // EMERGENCY FALLBACK WIDGET
+                        const backupWidgetUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
+                        document.getElementById('videoTitle').innerText = "Click Download Below";
+                        document.getElementById('hdDownloadBtn').href = backupWidgetUrl;
+                        document.getElementById('hdDownloadBtn').target = "_blank";
+                        if (previewContainer) previewContainer.style.display = "block";
+
+                    } catch (err) {
+                        console.error("Nexora Core Error:", err);
+                        const fallbackUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
+                        document.getElementById('videoTitle').innerText = "Click Download Below";
+                        document.getElementById('hdDownloadBtn').href = fallbackUrl;
+                        document.getElementById('hdDownloadBtn').target = "_blank";
+                        if (previewContainer) previewContainer.style.display = "block";
+                    } finally {
+                        dlBtn.innerText = "Download";
+                        dlBtn.disabled = false;
+                    }
+                };
+            }
+        });
+    </script>
+</body>
