@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. Download Logic ---
-   document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const dlBtn = document.getElementById('startDl');
     const input = document.getElementById('videoUrl');
     const previewContainer = document.getElementById('preview-container');
@@ -27,10 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dlBtn) {
         dlBtn.onclick = async () => {
             const url = input.value.trim();
-            if (!url) {
-                alert("Please paste a link!");
-                return;
-            }
+            if (!url) return alert("Please paste a link!");
 
             dlBtn.innerText = "Connecting...";
             dlBtn.disabled = true;
@@ -45,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok && data && data.url) {
-                    // வெற்றிகரமாக டேட்டா கிடைத்துவிட்டால்
                     document.getElementById('videoTitle').innerText = data.filename || "Video Ready";
                     document.getElementById('videoPreview').src = data.url;
                     document.getElementById('hdDownloadBtn').href = data.url;
@@ -55,12 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         previewContainer.scrollIntoView({ behavior: 'smooth' });
                     }
                 } else {
-                    // ஏபிஐ அனுப்பும் உண்மையான எர்ரர் மெசேஜ் இப்போ அலர்ட் ஆகும்
                     alert("API Error: " + (data.error || "Extraction failed. Server rate-limited."));
                 }
 
             } catch (err) {
-                console.error("Frontend Master Error:", err);
+                console.error("Frontend Error:", err);
                 alert("Server Connection Error! Please try again.");
             } finally {
                 dlBtn.innerText = "Download";
