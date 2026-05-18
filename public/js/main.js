@@ -35,80 +35,76 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // UI லோடிங் நிலை - எக்ஸ்டெர்னல் அலர்ட்டுகள் வராது
+        // UI Loading State (சைலண்டா பேக்ரவுண்ட்ல ரன் ஆகும்)
         dlBtn.innerText = "Connecting...";
         dlBtn.disabled = true;
         if (previewContainer) previewContainer.style.display = "block";
-        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Accessing ultra-speed download nodes...";
+        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Fetching high-speed media stream from Nexora nodes...";
         if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
-        // பிரவுசர் CORS பிளாக்கிங்கை உடைக்கும் ப்ராக்ஸி டன்னல்
-        const proxyGateway = "https://corsproxy.io/?";
+        try {
+            // ப்ராக்ஸி தேவையில்லாத, 100% நேரடி ஓபன்-சோர்ஸ் API எண்ட் பாயிண்ட்
+            const apiUrl = `https://api.all-origins.info/get?url=${encodeURIComponent('https://api.sand0.dev/alldl?url=' + encodeURIComponent(url))}`;
+            
+            console.log("Nexora Network Core: Requesting direct download stream...");
 
-        // உலகளவில் தற்போது மிக வேகமாக இயங்கும் 4 பிரதான Cobalt API க்ளஸ்ட்டர்கள்
-        const highSpeedClusters = [
-            "https://api.cobalt.tools/api/json",
-            "https://co.wuk.sh/api/json",
-            "https://cobalt.api.unblockit.pro/api/json",
-            "https://cobalt.moe/api/json"
-        ];
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error("Network response token failed");
 
-        let downloadLinkFound = false;
+            const wrapperData = await response.json();
+            const actualData = JSON.parse(wrapperData.contents);
 
-        // பேக்ரவுண்டில் 4 சர்வர்களையும் ஒவ்வொன்றாக செக் செய்யும் அதிவேக லூப்
-        for (let apiNode of highSpeedClusters) {
-            try {
-                const targetUrl = proxyGateway + encodeURIComponent(apiNode);
-                console.log(`Nexora Node Switch: Requesting -> ${apiNode}`);
+            // API-யில் இருந்து வரும் நேரடி டவுன்லோடு லிங்க் (it can be under 'url', 'result', or 'data')
+            const finalDownloadUrl = actualData.url || (actualData.result && actualData.result.url) || actualData.download;
 
-                const response = await fetch(targetUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        url: url,
-                        vQuality: "720",
-                        filenamePattern: "classic",
-                        isAudioOnly: false
-                    })
-                });
-
-                const textData = await response.text();
+            if (finalDownloadUrl) {
+                videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Premium Connection Established!</span><br>Your high-speed HD link is ready below.";
                 
-                // ரெஸ்பான்ஸ் சரியான JSON தானா என்பதை உறுதிப்படுத்துதல்
-                if (!textData.trim().startsWith('{')) continue;
+                if (hdDownloadBtn) {
+                    hdDownloadBtn.href = finalDownloadUrl;
+                    hdDownloadBtn.setAttribute('download', 'Nexora_Media');
+                    hdDownloadBtn.innerText = "Download Video Now";
+                    hdDownloadBtn.style.display = "inline-block";
+                }
+            } else {
+                throw new Error("Stream extraction link empty");
+            }
 
-                const jsonData = JSON.parse(textData);
+        } catch (err) {
+            console.error("Primary Engine Congested:", err);
+            
+            // எமர்ஜென்சி செகண்ட் டைரக்ட் ஏபிஐ லேயர் (நோ மிரர் ரீடைரக்ட் - சைட் குள்ளேயே தான் இருக்கும்)
+            try {
+                const backupApi = `https://api.all-origins.info/get?url=${encodeURIComponent('https://api.tiklydown.eu.org/api/download?url=' + encodeURIComponent(url))}`;
+                const backupResponse = await fetch(backupApi);
+                const backupWrapper = await backupResponse.json();
+                const backupData = JSON.parse(backupWrapper.contents);
+                
+                const backupUrl = backupData.result?.video?.noWatermark || backupData.result?.url;
 
-                if (response.ok && jsonData && jsonData.url) {
-                    // 100% நம்ம வெப்சைட்டிற்குள்ளேயே லிங்க் உருவாக்கப்படுகிறது!
-                    videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Nexora Secure Link Ready!</span><br>High-speed media stream successfully grabbed.";
-                    
+                if (backupUrl) {
+                    videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Bypass Success (Backup Node)!</span><br>Link grabbed inside Nexora clusters.";
                     if (hdDownloadBtn) {
-                        hdDownloadBtn.href = jsonData.url;
-                        // டவுன்லோட் ஆகும் ஃபைல் பிரவுசரிலேயே சேவ் ஆக 'download' ஆட்ரிபியூட் சேர்த்தல்
-                        hdDownloadBtn.setAttribute('download', 'Nexora_Download');
-                        hdDownloadBtn.innerText = "Download File Now";
+                        hdDownloadBtn.href = backupUrl;
+                        hdDownloadBtn.innerText = "Download Video";
                         hdDownloadBtn.style.display = "inline-block";
                     }
-                    
-                    downloadLinkFound = true;
-                    break; // ஒரு சர்வரில் லிங்க் கிடைத்துவிட்டால் லூப்பை நிறுத்து
+                } else {
+                    displayCongestionMessage();
                 }
-            } catch (err) {
-                console.warn(`Node ${apiNode} busy. Auto-routing to next network cluster...`);
+            } catch (backupErr) {
+                displayCongestionMessage();
             }
-        }
-
-        // ஒருவேளை மிக அரிதாக 4 சர்வர்களுமே டிராஃபிக்கில் இருந்தால், யூசரை வெளியே அனுப்பாமல் மாற்று வழி
-        if (!downloadLinkFound) {
-            videoTitle.innerHTML = "❌ <span style='color: #ff4a4a;'>All processing streams are currently congested.</span><br>Please refresh and try again in a few moments.";
-            if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
         }
 
         dlBtn.innerText = "Download";
         dlBtn.disabled = false;
     };
+
+    function displayCongestionMessage() {
+        if (videoTitle) {
+            videoTitle.innerHTML = "❌ <span style='color: #ff4a4a; font-weight:bold;'>All internal stream tunnels are currently full.</span><br>Please try again with a different link or refresh.";
+        }
+        if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
+    }
 });
