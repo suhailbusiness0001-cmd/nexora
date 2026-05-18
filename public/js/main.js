@@ -35,69 +35,70 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // UI லோடிங் ஸ்டேட் (நெக்ஸோரா பிராண்ட் கலரில் ஸ்பின்னர் ரன் ஆகும்)
+        // UI Loading State (நெக்ஸோரா தீம் ஸ்பின்னர் ரன் ஆகும்)
         dlBtn.innerText = "Connecting...";
         dlBtn.disabled = true;
         if (previewContainer) previewContainer.style.display = "block";
-        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Tunneling high-speed stream into Nexora nodes...";
+        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Tunneling high-speed media stream via Nexora Core Nodes...";
         if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
-        let finalDownloadLink = null;
+        let finalMediaUrl = null;
 
-        // லேயர் 1: நேரடி சாண்ட்பாக்ஸ் ஏபிஐ டன்னல் (CORS Bypass)
+        // லேயர் 1: புதிய அல்டிமேட் No-CORS Aioasf கேட்வே
         try {
-            console.log("Nexora Tunnel 1: Accessing sandbox media grid...");
-            const response = await fetch(`https://api.sand0.dev/alldl?url=${encodeURIComponent(url)}`);
-            if (response.ok) {
-                const data = await response.json();
-                finalDownloadLink = data.url || data.result?.url || data.download;
+            console.log("Nexora Core Route 1: Connecting to premium aioasf cluster...");
+            const res = await fetch(`https://api.aioasf.com/api/download?url=${encodeURIComponent(url)}`);
+            if (res.ok) {
+                const data = await res.json();
+                // வெவ்வேறு பிளாட்ஃபார்ம்களுக்கான மீடியா கீகளை செக் செய்தல்
+                finalMediaUrl = data.url || data.medias?.[0]?.url || data.download;
             }
         } catch (e) {
-            console.warn("Tunnel 1 congested. Auto-routing to network cluster 2...");
+            console.warn("Route 1 bypassed. Deploying emergency tunnel 2...");
         }
 
-        // லேயர் 2: லேயர் 1 பிஸியாக இருந்தால் இயங்கும் ஆல்-ஒரிஜின்ஸ் செக்யூர் மேப்பர்
-        if (!finalDownloadLink) {
+        // லேயர் 2: லேயர் 1 பிஸியாக இருந்தால் இயங்கும் லூவாநெட் எக்ஸ்ட்ராக்டர்
+        if (!finalMediaUrl) {
             try {
-                console.log("Nexora Tunnel 2: Deploying backup open gate proxy...");
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://api.sand0.dev/alldl?url=' + encodeURIComponent(url))}`;
-                const response = await fetch(proxyUrl);
-                if (response.ok) {
-                    const wrapper = await response.json();
-                    const innerData = JSON.parse(wrapper.contents);
-                    finalDownloadLink = innerData.url || innerData.result?.url || innerData.download;
+                console.log("Nexora Core Route 2: Deploying luanet backup cluster...");
+                const res = await fetch(`https://api.luanet.xyz/download?url=${encodeURIComponent(url)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    finalMediaUrl = data.result?.url || data.video || data.url;
                 }
             } catch (e) {
-                console.warn("Tunnel 2 bypassed.");
+                console.warn("Route 2 congested.");
             }
         }
 
-        // லேயர் 3: டிக்டாக் மற்றும் யூடியூப் பிரீமியம் எக்ஸ்ட்ராக்டர் லேயர்
-        if (!finalDownloadLink) {
+        // லேயர் 3: ஆல்-ஒரிஜின்ஸ் ஹைப்ரிட் டன்னல் லேயர் (CORS Bypass)
+        if (!finalMediaUrl) {
             try {
-                console.log("Nexora Tunnel 3: Initiating tiklydown core engine...");
-                const response = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    finalDownloadLink = data.result?.video?.noWatermark || data.result?.url || data.url;
+                console.log("Nexora Core Route 3: Deploying AllOrigins Proxy Bypass...");
+                const proxyWrapper = `https://api.allorigins.win/get?url=${encodeURIComponent('https://api.sand0.dev/alldl?url=' + encodeURIComponent(url))}`;
+                const res = await fetch(proxyWrapper);
+                if (res.ok) {
+                    const wrapperData = await res.json();
+                    const actualData = JSON.parse(wrapperData.contents);
+                    finalMediaUrl = actualData.url || actualData.result?.url;
                 }
             } catch (e) {
-                console.error("All Client-side Extraction Routes Full.");
+                console.error("All internal extraction layers exhausted.");
             }
         }
 
-        // 100% நம்ம சைட் குள்ளேயே பட்டனை ரெண்டர் செய்யும் லாஜிக் (மிரர் வெப்சைட்ஸ் கிடையாது!)
-        if (finalDownloadLink) {
-            videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Nexora Secure Tunnel Active!</span><br>Media link successfully grabbed inside our core nodes.";
+        // சைட் குள்ளேயே டவுன்லோடு பட்டனை ஆக்டிவேட் செய்யும் லாஜிக்
+        if (finalMediaUrl) {
+            videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Premium Connection Established!</span><br>Your high-speed secure HD link is ready below.";
             if (hdDownloadBtn) {
-                hdDownloadBtn.href = finalDownloadLink;
-                hdDownloadBtn.setAttribute('download', 'Nexora_Download');
+                hdDownloadBtn.href = finalMediaUrl;
+                hdDownloadBtn.setAttribute('download', 'Nexora_Media_Stream');
                 hdDownloadBtn.innerText = "Download Video Now";
                 hdDownloadBtn.style.display = "inline-block";
             }
         } else {
-            // எர்ரர் மெசேஜையும் வெளியே அனுப்பாமல் நெக்ஸோராவுக்குள்ளேயே காட்டுதல்
-            videoTitle.innerHTML = "❌ <span style='color: #ff4a4a; font-weight: bold;'>All internal download streams are currently crowded.</span><br>Please try again with a different link or refresh the page.";
+            // எர்ரர் மெசேஜையும் சைட் குள்ளேயே அழகாக காட்டுதல்
+            videoTitle.innerHTML = "❌ <span style='color: #ff4a4a; font-weight: bold;'>All stream tunnels are currently crowded.</span><br>Please refresh or try again with a different link.";
             if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
         }
 
