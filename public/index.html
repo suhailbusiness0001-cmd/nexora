@@ -26,27 +26,22 @@
 
     <section class="hero">
         <h1 class="gradient-text">Download Faster.</h1>
-        <p style="color: var(--text-dim);">Premium video downloader for TikTok, Instagram, and more.</p>
+        <p style="color: var(--text-dim);">Premium video downloader for TikTok, YouTube, Instagram, and more.</p>
         
         <div class="downloader-container">
             <div class="input-wrapper">
                 <input type="text" id="videoUrl" placeholder="Paste link here...">
                 <button class="dl-btn" id="startDl">Download</button>
-            }
             </div>
 
-            <div id="preview-container" style="display: none; margin-top: 25px; text-align: center; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
-                <h3 id="videoTitle" style="color: white; margin-bottom: 15px; font-size: 1.1rem;">Video Preview</h3>
-                
-                <video id="videoPreview" controls style="width: 100%; max-width: 350px; border-radius: 15px; margin-bottom: 15px;"></video>
-                
-                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                    <a id="hdDownloadBtn" href="#" target="_blank" style="padding: 10px 15px; background: #22c55e; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: none;">Download Video</a>
-                </div>
+            <div id="preview-container" style="display: none; margin-top: 25px; border-radius: 20px; overflow: hidden; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 10px;">
+                <h3 id="videoTitle" style="color: white; margin-bottom: 15px; font-size: 1.1rem;">Nexora Premium Stream Link</h3>
+                <iframe id="downloaderEngine" src="" style="width: 100%; height: 60px; border: none; overflow: hidden;" scrolling="no"></iframe>
             </div>
         </div>
 
         <div class="platforms">
+            <span class="badge"><i class="fab fa-youtube"></i> YouTube</span>
             <span class="badge"><i class="fab fa-tiktok"></i> TikTok</span>
             <span class="badge"><i class="fab fa-instagram"></i> Instagram</span>
             <span class="badge"><i class="fab fa-twitter"></i> Twitter/X</span>
@@ -82,98 +77,43 @@
             const dlBtn = document.getElementById('startDl');
             const input = document.getElementById('videoUrl');
             const previewContainer = document.getElementById('preview-container');
+            const downloaderEngine = document.getElementById('downloaderEngine');
             const videoTitle = document.getElementById('videoTitle');
-            const videoPreview = document.getElementById('videoPreview');
-            const hdDownloadBtn = document.getElementById('hdDownloadBtn');
 
             if (dlBtn) {
-                dlBtn.onclick = async () => {
+                dlBtn.onclick = () => {
                     const url = input.value.trim();
                     if (!url) return alert("Please paste a valid video link!");
 
-                    dlBtn.innerText = "Extracting Video...";
+                    // பட்டன் அனிமேஷன் மற்றும் UI லோடிங்
+                    dlBtn.innerText = "Generating...";
                     dlBtn.disabled = true;
-                    if (previewContainer) previewContainer.style.display = "none";
-                    if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
                     try {
-                        // CLUSTER 1: பிரண்ட்எண்ட் மூலம் நேரடியாக இயங்கும் எக்ஸ்ட்ராக்டர்
-                        const response = await fetch('https://api.allvideodownloader.cc/api/v1/download', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ url: url })
-                        });
-
-                        const textData = await response.text();
-                        let data;
-                        try {
-                            data = JSON.parse(textData);
-                        } catch(e) {
-                            throw new Error("Fallback required");
+                        // குளோபல் பிரீமியம் விட்ஜெட் இன்ஜின் - இது ஒருபோதும் முடங்காது!
+                        const universalWidgetUrl = `https://p.oceansaver.in/external/download.php?url=${encodeURIComponent(url)}&format=mp4&color=149777`;
+                        
+                        if (downloaderEngine) {
+                            downloaderEngine.src = universalWidgetUrl;
+                        }
+                        
+                        if (videoTitle) {
+                            videoTitle.innerHTML = "✨ <span style='color: #149777;'>Nexora Safe Downloader Node Ready:</span><br>Click the download button below to save your file.";
                         }
 
-                        if (response.ok && data && data.success && data.data) {
-                            const videoLink = data.data.video_url || data.data.download_url;
-                            
-                            if (videoTitle) videoTitle.innerText = data.data.title || "Nexora Ready File";
-                            if (videoPreview) videoPreview.src = videoLink;
-                            if (hdDownloadBtn) {
-                                hdDownloadBtn.href = videoLink;
-                                hdDownloadBtn.style.display = "inline-block";
-                            }
-
-                            if (previewContainer) {
-                                previewContainer.style.display = "block";
-                                previewContainer.scrollIntoView({ behavior: 'smooth' });
-                            }
-                            return;
+                        if (previewContainer) {
+                            previewContainer.style.display = "block";
+                            previewContainer.scrollIntoView({ behavior: 'smooth' });
                         }
-
-                        // CLUSTER 2: முதலாவது தவறினால் இயங்கும் மாற்று எஞ்சின்
-                        console.log("Switching to backup cluster...");
-                        const response2 = await fetch('https://api.download.savetube.me/v1/twitt/video-url', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ url: url })
-                        });
-
-                        const data2 = await response2.json();
-                        if (response2.ok && data2 && data2.url) {
-                            if (videoTitle) videoTitle.innerText = data2.title || "Nexora Premium Download";
-                            if (videoPreview) videoPreview.src = data2.url;
-                            if (hdDownloadBtn) {
-                                hdDownloadBtn.href = data2.url;
-                                hdDownloadBtn.style.display = "inline-block";
-                            }
-
-                            if (previewContainer) {
-                                previewContainer.style.display = "block";
-                                previewContainer.scrollIntoView({ behavior: 'smooth' });
-                            }
-                            return;
-                        }
-
-                        // EMERGENCY ROUTE: விட்ஜெட் மூலமாக மாற்று வழி
-                        const backupUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
-                        if (videoTitle) videoTitle.innerText = "Click Download Below to Save Media";
-                        if (hdDownloadBtn) {
-                            hdDownloadBtn.href = backupUrl;
-                            hdDownloadBtn.style.display = "inline-block";
-                        }
-                        if (previewContainer) previewContainer.style.display = "block";
 
                     } catch (err) {
-                        console.error("Nexora Network Core Error:", err);
-                        const fallbackUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
-                        if (videoTitle) videoTitle.innerText = "Click Download Below to Save Media";
-                        if (hdDownloadBtn) {
-                            hdDownloadBtn.href = fallbackUrl;
-                            hdDownloadBtn.style.display = "inline-block";
-                        }
-                        if (previewContainer) previewContainer.style.display = "block";
+                        console.error("Widget load crash:", err);
                     } finally {
-                        dlBtn.innerText = "Download";
-                        dlBtn.disabled = false;
+                        // 2 செகண்டில் பட்டனை மீண்டும் பழையபடி மாற்றிவிடும்
+                        setTimeout(() => {
+                            dlBtn.innerText = "Download";
+                            dlBtn.disabled = false;
+                        }, 2000);
                     }
                 };
             }
