@@ -19,91 +19,105 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. Download Logic ---
+  document.addEventListener('DOMContentLoaded', () => {
     const dlBtn = document.getElementById('startDl');
     const input = document.getElementById('videoUrl');
     const previewContainer = document.getElementById('preview-container');
+    const videoTitle = document.getElementById('videoTitle');
+    const hdDownloadBtn = document.getElementById('hdDownloadBtn');
 
-    if (dlBtn) {
-        dlBtn.onclick = async () => {
-            const url = input.value.trim();
-            if (!url) return alert("Please paste a valid video link!");
+    if (!dlBtn || !input) return;
 
-            dlBtn.innerText = "Extracting Media...";
-            dlBtn.disabled = true;
+    dlBtn.onclick = async () => {
+        const url = input.value.trim();
+        if (!url) {
+            alert("Please paste a valid video link!");
+            return;
+        }
 
-            try {
-                // ENGINE 1: பிரண்ட்எண்ட்ல இருந்தே நேரடியாக இயங்கும் அதிவேக ஓபன்-சோர்ஸ் API
-                const response = await fetch('https://api.allvideodownloader.cc/api/v1/download', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
-                });
+        // UI-ஐ லோடிங் நிலைக்கு மாற்றுதல்
+        dlBtn.innerText = "Connecting...";
+        dlBtn.disabled = true;
+        
+        if (previewContainer) previewContainer.style.display = "block";
+        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Bypassing restrictions & fetching media...";
+        if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
-                const data = await response.json();
+        // CORS பிளாக்கிங்கை உடைக்க ஃப்ரீ ப்ராக்ஸிகள்
+        const proxyList = [
+            'https://corsproxy.io/?',
+            'https://api.allorigins.win/raw?url='
+        ];
 
-                if (response.ok && data && data.success && data.data) {
-                    const videoLink = data.data.video_url || data.data.download_url;
+        // டாப் ஆக்டிவ் Cobalt சர்வர்கள்
+        const cobaltNodes = [
+            'https://cobalt.api.unblockit.pro/api/json',
+            'https://co.wuk.sh/api/json',
+            'https://api.cobalt.tools/api/json'
+        ];
+
+        let success = false;
+
+        // ப்ராக்ஸி மற்றும் ஏபிஐ-களை மாற்றி மாற்றி டெஸ்ட் செய்யும் லூப்
+        for (let proxy of proxyList) {
+            if (success) break;
+
+            for (let node of cobaltNodes) {
+                try {
+                    // ப்ராக்ஸி வழியா கோபால்ட் சர்வர் லிங்க் உருவாக்கப்படுகிறது
+                    const targetUrl = proxy + encodeURIComponent(node);
                     
-                    document.getElementById('videoTitle').innerText = data.data.title || "Nexora Ready File";
-                    document.getElementById('videoPreview').src = videoLink;
-                    document.getElementById('hdDownloadBtn').href = videoLink;
+                    console.log(`Nexora Core: Routing via -> ${targetUrl}`);
 
-                    if (previewContainer) {
-                        previewContainer.style.display = "block";
-                        previewContainer.scrollIntoView({ behavior: 'smooth' });
+                    const response = await fetch(targetUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            url: url,
+                            vQuality: "720",
+                            filenamePattern: "classic"
+                        })
+                    });
+
+                    const textData = await response.text();
+                    
+                    // HTML எர்ரர் பேஜ் வந்திருக்கா அல்லது JSON-ஆ என செக் செய்தல்
+                    if (!textData.trim().startsWith('{')) {
+                        continue; // JSON இல்லை என்றால் அடுத்த நோடுக்கு மாறு
                     }
-                    return;
-                }
 
-                // BACKUP ENGINE 2: முதலாவது பிஸியாக இருந்தால் இயங்கும் மாற்று எக்ஸ்ட்ராக்டர்
-                console.log("Switching to backup parser cluster...");
-                const response2 = await fetch('https://api.download.savetube.me/v1/twitt/video-url', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: url })
-                });
+                    const jsonData = JSON.parse(textData);
 
-                const data2 = await response2.json();
-                if (response2.ok && data2 && data2.url) {
-                    document.getElementById('videoTitle').innerText = data2.title || "Nexora Premium Download";
-                    document.getElementById('videoPreview').src = data2.url;
-                    document.getElementById('hdDownloadBtn').href = data2.url;
-
-                    if (previewContainer) {
-                        previewContainer.style.display = "block";
-                        previewContainer.scrollIntoView({ behavior: 'smooth' });
+                    if (jsonData && jsonData.url) {
+                        if (videoTitle) videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Bypass Success!</span><br>Your high-speed HD link is ready.";
+                        if (hdDownloadBtn) {
+                            hdDownloadBtn.href = jsonData.url;
+                            hdDownloadBtn.innerText = "Download Video Now";
+                            hdDownloadBtn.style.display = "inline-block";
+                        }
+                        success = true;
+                        break; // வெற்றி கிடைத்துவிட்டால் லூப்பை நிறுத்து
                     }
-                    return;
+                } catch (err) {
+                    console.warn(`Node request failed through current tunnel. Switching...`);
                 }
-
-                // EMERGENCY FALLBACK விட்ஜெட் லிங்க்
-                const backupWidgetUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
-                document.getElementById('videoTitle').innerText = "Click Download to Get Premium Media";
-                document.getElementById('hdDownloadBtn').href = backupWidgetUrl;
-                document.getElementById('hdDownloadBtn').target = "_blank";
-                
-                if (previewContainer) {
-                    previewContainer.style.display = "block";
-                    previewContainer.scrollIntoView({ behavior: 'smooth' });
-                }
-
-            } catch (err) {
-                console.error("Nexora Core Error:", err);
-                
-                // நெட்வொர்க் எர்ரர் வந்தால் நேரடியாக டவுன்லோடு செய்ய வைக்கும் விட்ஜெட்
-                const fallbackUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
-                document.getElementById('videoTitle').innerText = "Click Download to Get Premium Media";
-                document.getElementById('hdDownloadBtn').href = fallbackUrl;
-                document.getElementById('hdDownloadBtn').target = "_blank";
-                
-                if (previewContainer) {
-                    previewContainer.style.display = "block";
-                    previewContainer.scrollIntoView({ behavior: 'smooth' });
-                }
-            } finally {
-                dlBtn.innerText = "Download";
-                dlBtn.disabled = false;
             }
-        };
-    }
+        }
+
+        // ஒருவேளை எல்லா ப்ராக்ஸியும் ஃபெயில் ஆனால், யூசருக்கு எர்ரர் காட்டாமல் மாற்று தளம் காட்டுதல்
+        if (!success) {
+            if (videoTitle) videoTitle.innerHTML = "⚠️ Primary nodes busy.<br>Redirecting to backup premium gateway:";
+            if (hdDownloadBtn) {
+                hdDownloadBtn.href = `https://ssstik.io/en`; 
+                hdDownloadBtn.innerText = "Go to Mirror Download";
+                hdDownloadBtn.style.display = "inline-block";
+            }
+        }
+
+        dlBtn.innerText = "Download";
+        dlBtn.disabled = false;
+    };
 });

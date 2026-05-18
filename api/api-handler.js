@@ -1,9 +1,3 @@
-export default async function handler(req, res) {
-   /**
- * Nexora Premium API Handler Core Engine
- * Handled by: Pure Client-Side Stream Mapping
- */
-
 document.addEventListener('DOMContentLoaded', () => {
     const dlBtn = document.getElementById('startDl');
     const input = document.getElementById('videoUrl');
@@ -11,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoTitle = document.getElementById('videoTitle');
     const hdDownloadBtn = document.getElementById('hdDownloadBtn');
 
-    if (!dlBtn || !input) return;
+    if (!dlBtn) return;
 
     dlBtn.onclick = async () => {
         const url = input.value.trim();
@@ -20,26 +14,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // UI-ஐ லோடிங் ஸ்டேட்டுக்கு மாற்றுதல்
+        // UI-ஐ லோடிங் நிலைக்கு மாற்றுதல் (பழைய அலர்ட்டுகள் வராது)
         dlBtn.innerText = "Connecting...";
         dlBtn.disabled = true;
-        previewContainer.style.display = "block";
-        videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Initializing secure stream nodes...";
-        hdDownloadBtn.style.display = "none";
+        
+        if (previewContainer) previewContainer.style.display = "block";
+        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Fetching premium stream links...";
+        if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
-        // தற்போது ஆன்லைனில் 100% வொர்க் ஆகும் பப்ளிக் க்ளஸ்ட்டர்ஸ்
+        // தற்போது லைவ்வில் இருக்கும் பவர்புல் Cobalt ஏபிஐ க்ளஸ்ட்டர்கள்
         const clusterNodes = [
             'https://cobalt.api.unblockit.pro/api/json',
             'https://co.wuk.sh/api/json',
             'https://api.cobalt.tools/api/json'
         ];
 
-        let streamFetched = false;
+        let success = false;
 
-        // ஒவ்வொரு ஏபிஐ நோடாக பேக்ரவுண்டில் செக் செய்யும் அலர்ட்-ஃப்ரீ லூப்
+        // ஒவ்வொரு ஏபிஐ எண்ட்பாயிண்ட்டாக பேக்ரவுண்டில் டெஸ்ட் செய்யும் அலர்ட்-ஃப்ரீ லூப்
         for (let node of clusterNodes) {
             try {
-                console.log(`Nexora Node Shift: Requesting endpoint -> ${node}`);
+                console.log(`Nexora Shift: Trying cluster -> ${node}`);
                 
                 const response = await fetch(node, {
                     method: 'POST',
@@ -54,42 +49,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                 });
 
-                // ஏபிஐ டெக்ஸ்ட்டை முதலில் வாங்கி சேஃப் ஆக பார்ஸ் செய்தல் (SyntaxError-ஐ தடுக்க)
-                const textResponse = await response.text();
-                let jsonParsed;
+                // பாசிங் எர்ரர்களை (Unexpected token 'A') தடுக்க ரெஸ்பான்ஸை டெக்ஸ்ட்டாக மாற்றுதல்
+                const textData = await response.text();
+                let jsonData;
                 try {
-                    jsonParsed = JSON.parse(textResponse);
-                } catch (parseError) {
-                    continue; // JSON இல்லை என்றால் அடுத்த நோடுக்கு மாறு
+                    jsonData = JSON.parse(textData);
+                } catch (e) {
+                    continue; // JSON இல்லை என்றால் அடுத்த ஏபிஐ-க்கு மாறு
                 }
 
-                if (response.ok && jsonParsed && jsonParsed.url) {
-                    // வெற்றிகரமாக லிங்க் கிடைத்துவிட்டது!
-                    videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Connection Stable!</span><br>Premium Nexora HD node generated successfully.";
-                    hdDownloadBtn.href = jsonParsed.url;
+                if (response.ok && jsonData && jsonData.url) {
+                    videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Connection Stable!</span><br>Your high-speed Nexora HD link is ready.";
+                    hdDownloadBtn.href = jsonData.url;
+                    hdDownloadBtn.innerText = "Download Video Now";
                     hdDownloadBtn.style.display = "inline-block";
-                    hdDownloadBtn.innerText = "Download Video";
-                    streamFetched = true;
-                    break; 
+                    success = true;
+                    break; // லிங்க் கிடைத்துவிட்டால் லூப்பை நிறுத்து
                 }
-            } catch (nodeError) {
-                console.warn(`Node ${node} timed out or blocked. Automating cluster switch...`);
+            } catch (err) {
+                console.warn(`Node ${node} timed out. Auto-switching stream source...`);
             }
         }
 
-        // ஒருவேளை 3 முக்கிய ஏபிஐ-களும் டிராஃபிக்கால் முடங்கினால், இறுதி எமர்ஜென்சி பேக்கப் லிங்க்
-        if (!streamFetched) {
-            console.log("All main clusters crowded. Routing to emergency bypass mirror.");
-            videoTitle.innerHTML = "⚠️ Primary stream nodes are congested.<br>Redirecting through secure bypass proxy:";
+        // ஒருவேளை எல்லா ஏபிஐ-களும் டிராஃபிக்கால் முடங்கினால், இறுதி சேஃப் பைபாஸ் மிரர்
+        if (!success) {
+            videoTitle.innerHTML = "⚠️ Primary nodes busy.<br>Redirecting to high-speed mirror network:";
             
-            // 100% கேரண்டீட் ஓபன் சோர்ஸ் மாற்றுத் தளம்
-            const secureMirror = `https://ssstik.io/en`; 
-            hdDownloadBtn.href = secureMirror;
+            // 100% வொர்க்கிங் சேஃப் மிரர் லிங்க்
+            const safeFallback = `https://ssstik.io/en`; 
+            hdDownloadBtn.href = safeFallback;
+            hdDownloadBtn.innerText = "Go to Mirror Download";
             hdDownloadBtn.style.display = "inline-block";
-            hdDownloadBtn.innerText = "Go to High-Speed Mirror";
         }
 
-        // பட்டனை மீண்டும் பழைய நிலைக்குக் கொண்டு வருதல்
         dlBtn.innerText = "Download";
         dlBtn.disabled = false;
     };
