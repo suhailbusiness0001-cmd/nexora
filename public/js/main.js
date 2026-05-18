@@ -1,16 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. Theme Logic ---
-    const themeBtn = document.getElementById('theme-btn');
     const body = document.body;
-    const icon = themeBtn ? themeBtn.querySelector('i') : null;
+    const icon = document.getElementById('theme-btn') ? (document.getElementById('theme-btn')).querySelector('i') : null;
 
     if (localStorage.getItem('nexora-theme') === 'light') {
         body.classList.add('light-theme');
         if (icon) icon.classList.replace('fa-moon', 'fa-sun');
     }
 
-    if (themeBtn) {
-        themeBtn.addEventListener('click', () => {
+    if (document.getElementById('theme-btn')) {
+        (document.getElementById('theme-btn')).addEventListener('click', () => {
             body.classList.toggle('light-theme');
             const isLight = body.classList.contains('light-theme');
             if (icon) icon.classList.replace(isLight ? 'fa-moon' : 'fa-sun', isLight ? 'fa-sun' : 'fa-moon');
@@ -35,70 +34,42 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // UI Loading State (நெக்ஸோரா தீம் ஸ்பின்னர் ரன் ஆகும்)
+        // UI லோடிங் நிலைக்கு மாற்றுதல்
         dlBtn.innerText = "Connecting...";
         dlBtn.disabled = true;
         if (previewContainer) previewContainer.style.display = "block";
-        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Tunneling high-speed media stream via Nexora Core Nodes...";
+        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Tunneling secure stream via Nexora Backend API...";
         if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
-        let finalMediaUrl = null;
-
-        // லேயர் 1: புதிய அல்டிமேட் No-CORS Aioasf கேட்வே
         try {
-            console.log("Nexora Core Route 1: Connecting to premium aioasf cluster...");
-            const res = await fetch(`https://api.aioasf.com/api/download?url=${encodeURIComponent(url)}`);
-            if (res.ok) {
-                const data = await res.json();
-                // வெவ்வேறு பிளாட்ஃபார்ம்களுக்கான மீடியா கீகளை செக் செய்தல்
-                finalMediaUrl = data.url || data.medias?.[0]?.url || data.download;
-            }
-        } catch (e) {
-            console.warn("Route 1 bypassed. Deploying emergency tunnel 2...");
-        }
+            // நம்ம சொந்த வெப்சைட்டின் பேக் எண்ட் எண்ட் பாயிண்டிற்கு (/api/download) ரெக்வஸ்ட் அனுப்புகிறோம்
+            const response = await fetch('/api/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: url })
+            });
 
-        // லேயர் 2: லேயர் 1 பிஸியாக இருந்தால் இயங்கும் லூவாநெட் எக்ஸ்ட்ராக்டர்
-        if (!finalMediaUrl) {
-            try {
-                console.log("Nexora Core Route 2: Deploying luanet backup cluster...");
-                const res = await fetch(`https://api.luanet.xyz/download?url=${encodeURIComponent(url)}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    finalMediaUrl = data.result?.url || data.video || data.url;
+            const data = await response.json();
+
+            if (response.ok && data && data.url) {
+                videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Stream Grabbing Successful!</span><br>Your secure high-speed HD link is ready inside Nexora nodes.";
+                if (hdDownloadBtn) {
+                    hdDownloadBtn.href = data.url;
+                    hdDownloadBtn.setAttribute('download', 'Nexora_Download');
+                    hdDownloadBtn.innerText = "Download Video Now";
+                    hdDownloadBtn.style.display = "inline-block";
                 }
-            } catch (e) {
-                console.warn("Route 2 congested.");
+            } else {
+                throw new Error(data.error || "Extraction failed");
             }
-        }
 
-        // லேயர் 3: ஆல்-ஒரிஜின்ஸ் ஹைப்ரிட் டன்னல் லேயர் (CORS Bypass)
-        if (!finalMediaUrl) {
-            try {
-                console.log("Nexora Core Route 3: Deploying AllOrigins Proxy Bypass...");
-                const proxyWrapper = `https://api.allorigins.win/get?url=${encodeURIComponent('https://api.sand0.dev/alldl?url=' + encodeURIComponent(url))}`;
-                const res = await fetch(proxyWrapper);
-                if (res.ok) {
-                    const wrapperData = await res.json();
-                    const actualData = JSON.parse(wrapperData.contents);
-                    finalMediaUrl = actualData.url || actualData.result?.url;
-                }
-            } catch (e) {
-                console.error("All internal extraction layers exhausted.");
+        } catch (err) {
+            console.error("Client Error:", err);
+            if (videoTitle) {
+                videoTitle.innerHTML = "❌ <span style='color: #ff4a4a; font-weight: bold;'>All internal backend tunnels are congested.</span><br>Please refresh and try again with a different link.";
             }
-        }
-
-        // சைட் குள்ளேயே டவுன்லோடு பட்டனை ஆக்டிவேட் செய்யும் லாஜிக்
-        if (finalMediaUrl) {
-            videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Premium Connection Established!</span><br>Your high-speed secure HD link is ready below.";
-            if (hdDownloadBtn) {
-                hdDownloadBtn.href = finalMediaUrl;
-                hdDownloadBtn.setAttribute('download', 'Nexora_Media_Stream');
-                hdDownloadBtn.innerText = "Download Video Now";
-                hdDownloadBtn.style.display = "inline-block";
-            }
-        } else {
-            // எர்ரர் மெசேஜையும் சைட் குள்ளேயே அழகாக காட்டுதல்
-            videoTitle.innerHTML = "❌ <span style='color: #ff4a4a; font-weight: bold;'>All stream tunnels are currently crowded.</span><br>Please refresh or try again with a different link.";
             if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
         }
 

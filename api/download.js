@@ -1,4 +1,4 @@
-/ api/download.js
+// api/download.js
 export default async function handler(req, res) {
     // CORS ஹேண்ட்லிங் - பிரவுசர் பிளாக்கிங்கை தடுக்க
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'URL is required' });
     }
 
-    // பேக் எண்டில் பாதுகாப்பாக ரன் ஆகும் 3 பிரதான டவுன்லோடு க்ளஸ்ட்டர்கள்
+    // பேக் எண்டில் பாதுகாப்பாக ரன் ஆகும் 3 முதன்மை க்ளஸ்ட்டர்கள் (Cobalt, Unblockit, Sand0)
     const backendClusters = [
         "https://api.cobalt.tools/api/json",
         "https://co.wuk.sh/api/json",
@@ -29,7 +29,6 @@ export default async function handler(req, res) {
 
     for (let node of backendClusters) {
         try {
-            // சர்வர் டு சர்வர் (Server to Server) ரெக்வஸ்ட் என்பதால் எந்த CORS கட்டுப்பாடும் சர்வர்கள் விதிக்காது
             const response = await fetch(node, {
                 method: 'POST',
                 headers: {
@@ -46,16 +45,15 @@ export default async function handler(req, res) {
             if (response.ok) {
                 const data = await response.json();
                 if (data && data.url) {
-                    // லிங்க் கிடைத்துவிட்டால் நேரடியாக பிரவுசருக்கு அனுப்புதல்
                     return res.status(200).json({ url: data.url });
                 }
             }
         } catch (error) {
-            console.error(`Backend cluster ${node} failed, switching node...`);
+            console.error(`Backend cluster ${node} failed, switching route...`);
         }
     }
 
-    // ஆல்டர்நேட்டிவ் பேக் எண்ட் எமர்ஜென்சி ஏபிஐ லேயர்
+    // ஆல்டர்நேட்டிவ் பேக் எண்ட் எமர்ஜென்சி லேயர்
     try {
         const altRes = await fetch(`https://api.sand0.dev/alldl?url=${encodeURIComponent(url)}`);
         if (altRes.ok) {
