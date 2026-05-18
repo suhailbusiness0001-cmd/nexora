@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta name="language" content="English">
-<meta name="geo.region" content="US, GB, CA, AU">
+    <meta name="geo.region" content="US, GB, CA, AU">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora | Premium All-in-One Downloader</title>
@@ -10,83 +10,81 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-<nav class="navbar">
-    <div class="logo">
-        <a href="index.html" style="text-decoration:none; color:inherit;">NEXORA<span>.</span></a>
-    </div>
 
-    <div class="nav-links">
-        <a href="guide.html">Guide</a>
-        <a href="faq.html">FAQ</a>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html" style="text-decoration:none; color:inherit;">NEXORA<span>.</span></a>
+        </div>
+        <div class="nav-links">
+            <a href="guide.html">Guide</a>
+            <a href="faq.html">FAQ</a>
+            <button id="theme-btn" class="badge">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="gradient-text">Download Faster.</h1>
+        <p style="color: var(--text-dim);">Premium video downloader for TikTok, Instagram, and more.</p>
         
-        <button id="theme-btn" class="badge">
-            <i class="fas fa-moon"></i>
-        </button>
-    </div>
-</nav>
+        <div class="downloader-container">
+            <div class="input-wrapper">
+                <input type="text" id="videoUrl" placeholder="Paste link here...">
+                <button class="dl-btn" id="startDl">Download</button>
+            }
+            </div>
 
-   <section class="hero">
-    <h1 class="gradient-text">Download Faster.</h1>
-    <p style="color: var(--text-dim);">Premium video downloader for TikTok, Instagram, and more.</p>
-    
-    <div class="downloader-container">
-        <div class="input-wrapper">
-            <input type="text" id="videoUrl" placeholder="Paste link here...">
-            <button class="dl-btn" id="startDl">Download</button>
-        </div>
-
-        <div id="preview-container" style="display: none; margin-top: 25px; text-align: center; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
-            <video id="videoPreview" controls style="width: 100%; max-width: 350px; border-radius: 15px; margin-bottom: 15px;"></video>
-            <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                <a id="hdDownloadBtn" href="#" target="_blank" style="padding: 10px 15px; background: #22c55e; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: none;">HD <span id="hdSize"></span></a>
-                <a id="sdDownloadBtn" href="#" target="_blank" style="padding: 10px 15px; background: #6366f1; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: none;">SD <span id="sdSize"></span></a>
+            <div id="preview-container" style="display: none; margin-top: 25px; text-align: center; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 id="videoTitle" style="color: white; margin-bottom: 15px; font-size: 1.1rem;">Video Preview</h3>
+                
+                <video id="videoPreview" controls style="width: 100%; max-width: 350px; border-radius: 15px; margin-bottom: 15px;"></video>
+                
+                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                    <a id="hdDownloadBtn" href="#" target="_blank" style="padding: 10px 15px; background: #22c55e; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: none;">Download Video</a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="platforms">
-        <span class="badge"><i class="fab fa-tiktok"></i> TikTok</span>
-        <span class="badge"><i class="fab fa-instagram"></i> Instagram</span>
-        <span class="badge"><i class="fab fa-twitter"></i> Twitter/X</span>
-    </div>
+        <div class="platforms">
+            <span class="badge"><i class="fab fa-tiktok"></i> TikTok</span>
+            <span class="badge"><i class="fab fa-instagram"></i> Instagram</span>
+            <span class="badge"><i class="fab fa-twitter"></i> Twitter/X</span>
+        </div>
 
-    <div class="ad-placeholder">
-        <span>Advertisement</span>
-    </div>
-</section>
+        <div class="ad-placeholder">
+            <span>Advertisement</span>
+        </div>
+    </section>
 
-    <section class="features">
-        </section>
+    <section class="hero" style="background: rgba(255,255,255,0.01); border-top: 1px solid var(--glass-border);">
+        <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 60px 20px; text-align: left;">
+            <h2 class="gradient-text" style="font-size: 2rem; margin-bottom: 20px;">Nexora Global: The Choice for High-Speed Downloads</h2>
+            <p style="color: var(--text-dim); margin-bottom: 30px;">
+                Whether you are in New York, London, or Berlin, Nexora provides the fastest cloud-based server links to fetch your media in HD. Our infrastructure is optimized for Tier-1 networks to ensure zero latency.
+            </p>
 
-    <script src="js/main.js"></script>
-    
-    <script src="api/api-handler.js"></script>
-</body>
-</html>
-<section class="hero" style="background: rgba(255,255,255,0.01); border-top: 1px solid var(--glass-border);">
-    <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 60px 20px; text-align: left;">
-        <h2 class="gradient-text" style="font-size: 2rem; margin-bottom: 20px;">Nexora Global: The Choice for High-Speed Downloads</h2>
-        <p style="color: var(--text-dim); margin-bottom: 30px;">
-            Whether you are in <b>New York, London, or Berlin</b>, Nexora provides the fastest cloud-based server links to fetch your media in HD. Our infrastructure is optimized for Tier-1 networks to ensure zero latency.
-        </p>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="downloader-container" style="margin: 0; padding: 20px;">
-                <h4><i class="fas fa-globe-americas"></i> Privacy Focused</h4>
-                <p style="font-size: 0.85rem; color: var(--text-dim);">Strict compliance with GDPR and CCPA standards for our users in the US and Europe.</p>
-            </div>
-            <div class="downloader-container" style="margin: 0; padding: 20px;">
-                <h4><i class="fas fa-server"></i> Edge Servers</h4>
-                <p style="font-size: 0.85rem; color: var(--text-dim);">Media processing happens on servers closest to your location for maximum speed.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="downloader-container" style="margin: 0; padding: 20px;">
+                    <h4><i class="fas fa-globe-americas"></i> Privacy Focused</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-dim);">Strict compliance with GDPR and CCPA standards for our users in the US and Europe.</p>
+                </div>
+                <div class="downloader-container" style="margin: 0; padding: 20px;">
+                    <h4><i class="fas fa-server"></i> Edge Servers</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-dim);">Media processing happens on servers closest to your location for maximum speed.</p>
+                </div>
             </div>
         </div>
-    </div>
-</section>
-<script>
+    </section>
+
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dlBtn = document.getElementById('startDl');
             const input = document.getElementById('videoUrl');
             const previewContainer = document.getElementById('preview-container');
+            const videoTitle = document.getElementById('videoTitle');
+            const videoPreview = document.getElementById('videoPreview');
+            const hdDownloadBtn = document.getElementById('hdDownloadBtn');
 
             if (dlBtn) {
                 dlBtn.onclick = async () => {
@@ -95,9 +93,11 @@
 
                     dlBtn.innerText = "Extracting Video...";
                     dlBtn.disabled = true;
+                    if (previewContainer) previewContainer.style.display = "none";
+                    if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
                     try {
-                        // 1st DIRECT ENGINE: பிரண்ட்எண்ட்ல இருந்தே நேரடியாக இயங்கும் API
+                        // CLUSTER 1: பிரண்ட்எண்ட் மூலம் நேரடியாக இயங்கும் எக்ஸ்ட்ராக்டர்
                         const response = await fetch('https://api.allvideodownloader.cc/api/v1/download', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -109,15 +109,18 @@
                         try {
                             data = JSON.parse(textData);
                         } catch(e) {
-                            throw new Error("Engine 1 text response");
+                            throw new Error("Fallback required");
                         }
 
                         if (response.ok && data && data.success && data.data) {
                             const videoLink = data.data.video_url || data.data.download_url;
                             
-                            document.getElementById('videoTitle').innerText = data.data.title || "Nexora Ready File";
-                            document.getElementById('videoPreview').src = videoLink;
-                            document.getElementById('hdDownloadBtn').href = videoLink;
+                            if (videoTitle) videoTitle.innerText = data.data.title || "Nexora Ready File";
+                            if (videoPreview) videoPreview.src = videoLink;
+                            if (hdDownloadBtn) {
+                                hdDownloadBtn.href = videoLink;
+                                hdDownloadBtn.style.display = "inline-block";
+                            }
 
                             if (previewContainer) {
                                 previewContainer.style.display = "block";
@@ -126,8 +129,8 @@
                             return;
                         }
 
-                        // 2nd BACKUP ENGINE
-                        console.log("Switching to backup parser...");
+                        // CLUSTER 2: முதலாவது தவறினால் இயங்கும் மாற்று எஞ்சின்
+                        console.log("Switching to backup cluster...");
                         const response2 = await fetch('https://api.download.savetube.me/v1/twitt/video-url', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -136,9 +139,12 @@
 
                         const data2 = await response2.json();
                         if (response2.ok && data2 && data2.url) {
-                            document.getElementById('videoTitle').innerText = data2.title || "Nexora Premium Download";
-                            document.getElementById('videoPreview').src = data2.url;
-                            document.getElementById('hdDownloadBtn').href = data2.url;
+                            if (videoTitle) videoTitle.innerText = data2.title || "Nexora Premium Download";
+                            if (videoPreview) videoPreview.src = data2.url;
+                            if (hdDownloadBtn) {
+                                hdDownloadBtn.href = data2.url;
+                                hdDownloadBtn.style.display = "inline-block";
+                            }
 
                             if (previewContainer) {
                                 previewContainer.style.display = "block";
@@ -147,19 +153,23 @@
                             return;
                         }
 
-                        // EMERGENCY FALLBACK WIDGET
-                        const backupWidgetUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
-                        document.getElementById('videoTitle').innerText = "Click Download Below";
-                        document.getElementById('hdDownloadBtn').href = backupWidgetUrl;
-                        document.getElementById('hdDownloadBtn').target = "_blank";
+                        // EMERGENCY ROUTE: விட்ஜெட் மூலமாக மாற்று வழி
+                        const backupUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
+                        if (videoTitle) videoTitle.innerText = "Click Download Below to Save Media";
+                        if (hdDownloadBtn) {
+                            hdDownloadBtn.href = backupUrl;
+                            hdDownloadBtn.style.display = "inline-block";
+                        }
                         if (previewContainer) previewContainer.style.display = "block";
 
                     } catch (err) {
-                        console.error("Nexora Core Error:", err);
+                        console.error("Nexora Network Core Error:", err);
                         const fallbackUrl = `https://9download.me/query?url=${encodeURIComponent(url)}`;
-                        document.getElementById('videoTitle').innerText = "Click Download Below";
-                        document.getElementById('hdDownloadBtn').href = fallbackUrl;
-                        document.getElementById('hdDownloadBtn').target = "_blank";
+                        if (videoTitle) videoTitle.innerText = "Click Download Below to Save Media";
+                        if (hdDownloadBtn) {
+                            hdDownloadBtn.href = fallbackUrl;
+                            hdDownloadBtn.style.display = "inline-block";
+                        }
                         if (previewContainer) previewContainer.style.display = "block";
                     } finally {
                         dlBtn.innerText = "Download";
@@ -170,3 +180,4 @@
         });
     </script>
 </body>
+</html>
