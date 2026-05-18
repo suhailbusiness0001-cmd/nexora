@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. Download Logic ---
-   document.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('DOMContentLoaded', () => {
     const dlBtn = document.getElementById('startDl');
     const input = document.getElementById('videoUrl');
     const previewContainer = document.getElementById('preview-container');
@@ -34,43 +34,49 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // UI லோடிங் நிலைக்கு மாற்றுதல்
+        // UI Loading State 
         dlBtn.innerText = "Connecting...";
         dlBtn.disabled = true;
         if (previewContainer) previewContainer.style.display = "block";
-        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Tunneling secure stream via Nexora Backend API...";
+        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Tunneling secure stream via Nexora Backend Node...";
         if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
         try {
-            // நம்ம சொந்த வெப்சைட்டின் பேக் எண்ட் எண்ட் பாயிண்டிற்கு (/api/download) ரெக்வஸ்ட் அனுப்புகிறோம்
-            const response = await fetch('/api/download', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ url: url })
-            });
+            // லோக்கலாக இருந்தால் நேரடியாக பப்ளிக் கேட்வேக்கும், லைவாக இருந்தால் நம்ம சொந்த ஏபிஐ-க்கும் மாறும் லாஜிக்
+            const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
+            const endpoint = isLocal ? `https://api.sand0.dev/alldl?url=${encodeURIComponent(url)}` : '/api/download';
 
-            const data = await response.json();
+            let finalLink = null;
 
-            if (response.ok && data && data.url) {
-                videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Stream Grabbing Successful!</span><br>Your secure high-speed HD link is ready inside Nexora nodes.";
+            if (isLocal) {
+                const res = await fetch(endpoint);
+                const data = await res.json();
+                finalLink = data.url || data.result?.url;
+            } else {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+                const data = await res.json();
+                finalLink = data.url;
+            }
+
+            if (finalLink) {
+                videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Premium Connection Stable!</span><br>Your high-speed secure HD link is ready below.";
                 if (hdDownloadBtn) {
-                    hdDownloadBtn.href = data.url;
-                    hdDownloadBtn.setAttribute('download', 'Nexora_Download');
+                    hdDownloadBtn.href = finalLink;
+                    hdDownloadBtn.setAttribute('download', 'Nexora_Media_Stream');
                     hdDownloadBtn.innerText = "Download Video Now";
                     hdDownloadBtn.style.display = "inline-block";
                 }
             } else {
-                throw new Error(data.error || "Extraction failed");
+                throw new Error("Empty token");
             }
 
         } catch (err) {
-            console.error("Client Error:", err);
-            if (videoTitle) {
-                videoTitle.innerHTML = "❌ <span style='color: #ff4a4a; font-weight: bold;'>All internal backend tunnels are congested.</span><br>Please refresh and try again with a different link.";
-            }
-            if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
+            console.error(err);
+            videoTitle.innerHTML = "❌ <span style='color: #ff4a4a; font-weight: bold;'>All internal stream tunnels are crowded.</span><br>Please refresh or try again with a different link.";
         }
 
         dlBtn.innerText = "Download";

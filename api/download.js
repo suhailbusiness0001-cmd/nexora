@@ -1,6 +1,6 @@
 // api/download.js
 export default async function handler(req, res) {
-    // CORS ஹேண்ட்லிங் - பிரவுசர் பிளாக்கிங்கை தடுக்க
+    // பிரவுசர் CORS பிளாக்கிங்கை உடைக்க
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -20,52 +20,43 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'URL is required' });
     }
 
-    // பேக் எண்டில் பாதுகாப்பாக ரன் ஆகும் 3 முதன்மை க்ளஸ்ட்டர்கள் (Cobalt, Unblockit, Sand0)
-    const backendClusters = [
+    // வீடியோவில் சொன்னது போல பேக் எண்ட் டு சர்வர் ரன் ஆகும் 3 பிரீமியம் கேட்வேகள்
+    const ytDlpNodes = [
         "https://api.cobalt.tools/api/json",
         "https://co.wuk.sh/api/json",
-        "https://cobalt.api.unblockit.pro/api/json"
+        "https://api.sand0.dev/alldl?url=" + encodeURIComponent(url)
     ];
 
-    for (let node of backendClusters) {
-        try {
-            const response = await fetch(node, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    url: url,
-                    vQuality: "720",
-                    filenamePattern: "classic"
-                })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                if (data && data.url) {
-                    return res.status(200).json({ url: data.url });
-                }
-            }
-        } catch (error) {
-            console.error(`Backend cluster ${node} failed, switching route...`);
-        }
-    }
-
-    // ஆல்டர்நேட்டிவ் பேக் எண்ட் எமர்ஜென்சி லேயர்
+    // முதலாவது செக்யூர் நோட் (Cobalt Core)
     try {
-        const altRes = await fetch(`https://api.sand0.dev/alldl?url=${encodeURIComponent(url)}`);
-        if (altRes.ok) {
-            const altData = await altRes.json();
-            const finalUrl = altData.url || altData.result?.url;
-            if (finalUrl) {
-                return res.status(200).json({ url: finalUrl });
-            }
+        const response = await fetch(ytDlpNodes[0], {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ url: url, vQuality: "720", filenamePattern: "classic" })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.url) return res.status(200).json({ url: data.url });
         }
     } catch (e) {
-        console.error("Alternative extraction failed too.");
+        console.log("Primary cluster busy, auto-switching...");
     }
 
-    return res.status(500).json({ error: 'All premium download servers are crowded' });
+    // பேக்கப் நோட் (Sand0 Core)
+    try {
+        const response = await fetch(`https://api.sand0.dev/alldl?url=${encodeURIComponent(url)}`);
+        if (response.ok) {
+            const data = await response.json();
+            const finalUrl = data.url || data.result?.url;
+            if (finalUrl) return res.status(200).json({ url: finalUrl });
+        }
+    } catch (e) {
+        console.error("All backend routing failed.");
+    }
+
+    return res.status(500).json({ error: 'Nexora servers are currently busy.' });
 }
