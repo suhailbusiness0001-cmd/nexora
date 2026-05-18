@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. Download Logic ---
- document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
     const dlBtn = document.getElementById('startDl');
     const input = document.getElementById('videoUrl');
     const previewContainer = document.getElementById('preview-container');
@@ -35,46 +35,77 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // UI லோடிங் ஸ்டேட்
+        // UI லோடிங் நிலை - எக்ஸ்டெர்னல் அலர்ட்டுகள் வராது
         dlBtn.innerText = "Connecting...";
         dlBtn.disabled = true;
         if (previewContainer) previewContainer.style.display = "block";
-        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Fetching premium streaming link...";
+        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Accessing ultra-speed download nodes...";
         if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
-        // கன்சோல் எர்ரர் வராமல் தடுக்க 'corsproxy.io' மற்றும் ஸ்டேபிள் Cobalt API இணைப்பு
-        const targetApi = "https://corsproxy.io/?" + encodeURIComponent("https://api.cobalt.tools/api/json");
+        // பிரவுசர் CORS பிளாக்கிங்கை உடைக்கும் ப்ராக்ஸி டன்னல்
+        const proxyGateway = "https://corsproxy.io/?";
 
-        try {
-            const response = await fetch(targetApi, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    url: url,
-                    vQuality: "720",
-                    filenamePattern: "classic"
-                })
-            });
+        // உலகளவில் தற்போது மிக வேகமாக இயங்கும் 4 பிரதான Cobalt API க்ளஸ்ட்டர்கள்
+        const highSpeedClusters = [
+            "https://api.cobalt.tools/api/json",
+            "https://co.wuk.sh/api/json",
+            "https://cobalt.api.unblockit.pro/api/json",
+            "https://cobalt.moe/api/json"
+        ];
 
-            const data = await response.json();
+        let downloadLinkFound = false;
 
-            if (data && data.url) {
-                videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Link Generated!</span><br>Your high-speed Nexora link is ready.";
-                hdDownloadBtn.href = data.url;
-                hdDownloadBtn.innerText = "Download Video";
-                hdDownloadBtn.style.display = "inline-block";
-            } else {
-                throw new Error("Invalid API response");
+        // பேக்ரவுண்டில் 4 சர்வர்களையும் ஒவ்வொன்றாக செக் செய்யும் அதிவேக லூப்
+        for (let apiNode of highSpeedClusters) {
+            try {
+                const targetUrl = proxyGateway + encodeURIComponent(apiNode);
+                console.log(`Nexora Node Switch: Requesting -> ${apiNode}`);
+
+                const response = await fetch(targetUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: url,
+                        vQuality: "720",
+                        filenamePattern: "classic",
+                        isAudioOnly: false
+                    })
+                });
+
+                const textData = await response.text();
+                
+                // ரெஸ்பான்ஸ் சரியான JSON தானா என்பதை உறுதிப்படுத்துதல்
+                if (!textData.trim().startsWith('{')) continue;
+
+                const jsonData = JSON.parse(textData);
+
+                if (response.ok && jsonData && jsonData.url) {
+                    // 100% நம்ம வெப்சைட்டிற்குள்ளேயே லிங்க் உருவாக்கப்படுகிறது!
+                    videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Nexora Secure Link Ready!</span><br>High-speed media stream successfully grabbed.";
+                    
+                    if (hdDownloadBtn) {
+                        hdDownloadBtn.href = jsonData.url;
+                        // டவுன்லோட் ஆகும் ஃபைல் பிரவுசரிலேயே சேவ் ஆக 'download' ஆட்ரிபியூட் சேர்த்தல்
+                        hdDownloadBtn.setAttribute('download', 'Nexora_Download');
+                        hdDownloadBtn.innerText = "Download File Now";
+                        hdDownloadBtn.style.display = "inline-block";
+                    }
+                    
+                    downloadLinkFound = true;
+                    break; // ஒரு சர்வரில் லிங்க் கிடைத்துவிட்டால் லூப்பை நிறுத்து
+                }
+            } catch (err) {
+                console.warn(`Node ${apiNode} busy. Auto-routing to next network cluster...`);
             }
-        } catch (err) {
-            console.warn("Primary bypass crowded, launching mirror channel.");
-            videoTitle.innerHTML = "⚠️ API nodes are temporarily busy.<br>Redirecting to high-speed backup gateway:";
-            hdDownloadBtn.href = "https://ssstik.io/en";
-            hdDownloadBtn.innerText = "Go to Mirror Download";
-            hdDownloadBtn.style.display = "inline-block";
+        }
+
+        // ஒருவேளை மிக அரிதாக 4 சர்வர்களுமே டிராஃபிக்கில் இருந்தால், யூசரை வெளியே அனுப்பாமல் மாற்று வழி
+        if (!downloadLinkFound) {
+            videoTitle.innerHTML = "❌ <span style='color: #ff4a4a;'>All processing streams are currently congested.</span><br>Please refresh and try again in a few moments.";
+            if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
         }
 
         dlBtn.innerText = "Download";
