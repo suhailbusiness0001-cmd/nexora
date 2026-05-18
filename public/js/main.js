@@ -34,52 +34,74 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // UI Loading State 
+        // UI Loading State (Nexora Theme)
         dlBtn.innerText = "Connecting...";
         dlBtn.disabled = true;
         if (previewContainer) previewContainer.style.display = "block";
-        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Tunneling secure stream via Nexora Backend Node...";
+        if (videoTitle) videoTitle.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:#149777;'></i> Tunneling secure stream via Nexora Core...";
         if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
 
-        try {
-            // லோக்கலாக இருந்தால் நேரடியாக பப்ளிக் கேட்வேக்கும், லைவாக இருந்தால் நம்ம சொந்த ஏபிஐ-க்கும் மாறும் லாஜிக்
-            const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-            const endpoint = isLocal ? `https://api.sand0.dev/alldl?url=${encodeURIComponent(url)}` : '/api/download';
+        let finalLink = null;
 
-            let finalLink = null;
+        try {
+            // லோக்கலா அல்லது லைவ் சர்வரானு செக் பண்றோம்
+            const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
 
             if (isLocal) {
-                const res = await fetch(endpoint);
-                const data = await res.json();
-                finalLink = data.url || data.result?.url;
+                console.log("Local Environment: Using secure public fallback cluster...");
+                const res = await fetch(`https://api.sand0.dev/alldl?url=${encodeURIComponent(url)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    finalLink = data.url || data.result?.url;
+                }
             } else {
-                const res = await fetch(endpoint, {
+                console.log("Live Production: Route initiated via Vercel Serverless Node...");
+                const res = await fetch('/api/download', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: url })
                 });
-                const data = await res.json();
-                finalLink = data.url;
-            }
-
-            if (finalLink) {
-                videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Premium Connection Stable!</span><br>Your high-speed secure HD link is ready below.";
-                if (hdDownloadBtn) {
-                    hdDownloadBtn.href = finalLink;
-                    hdDownloadBtn.setAttribute('download', 'Nexora_Media_Stream');
-                    hdDownloadBtn.innerText = "Download Video Now";
-                    hdDownloadBtn.style.display = "inline-block";
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    finalLink = data.url;
                 }
-            } else {
-                throw new Error("Empty token");
             }
-
         } catch (err) {
-            console.error(err);
+            console.warn("Primary path congested. Checking backup gateway configurations...");
+        }
+
+        // எமர்ஜென்சி பேக்கப் ரூட் (AllOrigins Proxy Cluster)
+        if (!finalLink) {
+            try {
+                console.log("Deploying emergency proxy wrapper...");
+                const proxyWrapper = `https://api.allorigins.win/get?url=${encodeURIComponent('https://api.sand0.dev/alldl?url=' + encodeURIComponent(url))}`;
+                const res = await fetch(proxyWrapper);
+                if (res.ok) {
+                    const wrapperData = await res.json();
+                    const actualData = JSON.parse(wrapperData.contents);
+                    finalLink = actualData.url || actualData.result?.url;
+                }
+            } catch (proxyErr) {
+                console.error("All extraction layers exhausted.");
+            }
+        }
+
+        // டவுன்லோடு பட்டன் ரெண்டரிங் லாஜிக்
+        if (finalLink) {
+            videoTitle.innerHTML = "🎉 <span style='color: #149777; font-weight: bold;'>Premium Connection Stable!</span><br>Your high-speed secure HD link is ready inside Nexora nodes.";
+            if (hdDownloadBtn) {
+                hdDownloadBtn.href = finalLink;
+                hdDownloadBtn.setAttribute('download', 'Nexora_Download');
+                hdDownloadBtn.innerText = "Download Video Now";
+                hdDownloadBtn.style.display = "inline-block";
+            }
+        } else {
             videoTitle.innerHTML = "❌ <span style='color: #ff4a4a; font-weight: bold;'>All internal stream tunnels are crowded.</span><br>Please refresh or try again with a different link.";
+            if (hdDownloadBtn) hdDownloadBtn.style.display = "none";
         }
 
         dlBtn.innerText = "Download";
         dlBtn.disabled = false;
     };
-})
+});
