@@ -34,9 +34,12 @@
                 <button class="dl-btn" id="startDl">Download</button>
             </div>
 
-            <div id="preview-container" style="display: none; margin-top: 25px; border-radius: 20px; overflow: hidden; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 10px;">
-                <h3 id="videoTitle" style="color: white; margin-bottom: 15px; font-size: 1.1rem;">Nexora Premium Stream Link</h3>
-                <iframe id="downloaderEngine" src="" style="width: 100%; height: 60px; border: none; overflow: hidden;" scrolling="no"></iframe>
+            <div id="preview-container" style="display: none; margin-top: 25px; text-align: center; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 id="videoTitle" style="color: white; margin-bottom: 15px; font-size: 1.1rem; line-height: 1.4;">Processing Request...</h3>
+                
+                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                    <a id="hdDownloadBtn" href="#" target="_blank" style="padding: 14px 28px; background: #149777; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: none; box-shadow: 0 4px 15px rgba(20, 151, 119, 0.3); transition: all 0.3s ease;">Download File Now</a>
+                </div>
             </div>
         </div>
 
@@ -52,72 +55,6 @@
         </div>
     </section>
 
-    <section class="hero" style="background: rgba(255,255,255,0.01); border-top: 1px solid var(--glass-border);">
-        <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 60px 20px; text-align: left;">
-            <h2 class="gradient-text" style="font-size: 2rem; margin-bottom: 20px;">Nexora Global: The Choice for High-Speed Downloads</h2>
-            <p style="color: var(--text-dim); margin-bottom: 30px;">
-                Whether you are in New York, London, or Berlin, Nexora provides the fastest cloud-based server links to fetch your media in HD. Our infrastructure is optimized for Tier-1 networks to ensure zero latency.
-            </p>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="downloader-container" style="margin: 0; padding: 20px;">
-                    <h4><i class="fas fa-globe-americas"></i> Privacy Focused</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Strict compliance with GDPR and CCPA standards for our users in the US and Europe.</p>
-                </div>
-                <div class="downloader-container" style="margin: 0; padding: 20px;">
-                    <h4><i class="fas fa-server"></i> Edge Servers</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-dim);">Media processing happens on servers closest to your location for maximum speed.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const dlBtn = document.getElementById('startDl');
-            const input = document.getElementById('videoUrl');
-            const previewContainer = document.getElementById('preview-container');
-            const downloaderEngine = document.getElementById('downloaderEngine');
-            const videoTitle = document.getElementById('videoTitle');
-
-            if (dlBtn) {
-                dlBtn.onclick = () => {
-                    const url = input.value.trim();
-                    if (!url) return alert("Please paste a valid video link!");
-
-                    // பட்டன் அனிமேஷன் மற்றும் UI லோடிங்
-                    dlBtn.innerText = "Generating...";
-                    dlBtn.disabled = true;
-
-                    try {
-                        // குளோபல் பிரீமியம் விட்ஜெட் இன்ஜின் - இது ஒருபோதும் முடங்காது!
-                        const universalWidgetUrl = `https://p.oceansaver.in/external/download.php?url=${encodeURIComponent(url)}&format=mp4&color=149777`;
-                        
-                        if (downloaderEngine) {
-                            downloaderEngine.src = universalWidgetUrl;
-                        }
-                        
-                        if (videoTitle) {
-                            videoTitle.innerHTML = "✨ <span style='color: #149777;'>Nexora Safe Downloader Node Ready:</span><br>Click the download button below to save your file.";
-                        }
-
-                        if (previewContainer) {
-                            previewContainer.style.display = "block";
-                            previewContainer.scrollIntoView({ behavior: 'smooth' });
-                        }
-
-                    } catch (err) {
-                        console.error("Widget load crash:", err);
-                    } finally {
-                        // 2 செகண்டில் பட்டனை மீண்டும் பழையபடி மாற்றிவிடும்
-                        setTimeout(() => {
-                            dlBtn.innerText = "Download";
-                            dlBtn.disabled = false;
-                        }, 2000);
-                    }
-                };
-            }
-        });
-    </script>
+    <script src="js/handler.js"></script>
 </body>
 </html>
